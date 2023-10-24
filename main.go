@@ -3,7 +3,6 @@ package main
 import "fmt"
 
 func main() {
-
 	sc := NewScreen()
 	sc.Print()
 	for !sc.Game() {
@@ -11,5 +10,4 @@ func main() {
 		sc.Print()
 	}
 	fmt.Println("Congratulaciones")
-
 }
