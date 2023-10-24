@@ -9,6 +9,7 @@ func main() {
 		sc.Move()
 		sc.Print()
 		sc.EvaluateAction()
+		sc.Print()
 	}
 	sc.PrintFinal()
 	fmt.Println("Congratulaciones")
