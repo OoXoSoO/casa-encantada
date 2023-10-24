@@ -9,29 +9,33 @@ import (
 )
 
 type Screen struct {
-	cells     [][]Cell
-	cellCandy *Cell
+	cells      [][]Cell
+	cellCandy  *Cell
+	challenger Challenger
+	maxRows    int
+	maxCol     int
 }
 
-const MaxRows = 3
-const MaxCol = 3
+func NewScreen(maxRows int, maxCol int) *Screen {
 
-func NewScreen() *Screen {
 	ra := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	ret := Screen{
-		cells: make([][]Cell, MaxRows+1),
+		cells:      make([][]Cell, maxRows+1),
+		maxRows:    maxRows,
+		maxCol:     maxCol,
+		challenger: NewChallenger(),
 	}
 	for rowIdx := range ret.cells {
-		row := make([]Cell, MaxCol+1)
+		row := make([]Cell, ret.maxCol+1)
 		for colIdx := range row {
 			row[colIdx] = NewCell()
 		}
 		ret.cells[rowIdx] = row
 	}
 
-	doorPosRow := ra.Intn(MaxRows)
-	doorPosCol := ra.Intn(MaxCol)
+	doorPosRow := ra.Intn(ret.maxRows)
+	doorPosCol := ra.Intn(ret.maxCol)
 	ret.cells[doorPosRow][doorPosCol] = Cell{
 		Type:    CellTypeDoor,
 		Success: true,
@@ -42,8 +46,8 @@ func NewScreen() *Screen {
 	candyPosCol := doorPosCol
 
 	for candyPosCol == doorPosCol && candyPosRow == doorPosRow {
-		candyPosRow = ra.Intn(MaxRows)
-		candyPosCol = ra.Intn(MaxCol)
+		candyPosRow = ra.Intn(ret.maxRows)
+		candyPosCol = ra.Intn(ret.maxCol)
 	}
 	ret.cells[candyPosRow][candyPosCol] = Cell{
 		Type:    CellTypeCandy,
@@ -57,14 +61,21 @@ func (sc *Screen) Game() bool {
 	return sc.cellCandy.Busy
 }
 func (sc *Screen) Print() {
+	sc.print(true)
+}
+func (sc *Screen) PrintFinal() {
+	sc.print(false)
+}
+func (sc *Screen) print(printBusy bool) {
 	runCmd("cmd", "/c", "cls")
 	for _, row := range sc.cells {
 		for _, col := range row {
-			col.Print()
+			col.Print(printBusy)
 		}
 		println("")
 	}
 }
+
 func runCmd(name string, arg ...string) {
 	cmd := exec.Command(name, arg...)
 	cmd.Stdout = os.Stdout
@@ -83,7 +94,7 @@ func (sc *Screen) Move() {
 	newBusyCol := busyCol
 	switch key {
 	case KeyArrowDown:
-		if busyRow+1 <= MaxRows {
+		if busyRow+1 <= sc.maxRows {
 			newBusyRow = busyRow + 1
 		}
 	case KeyArrowUp:
@@ -91,7 +102,7 @@ func (sc *Screen) Move() {
 			newBusyRow = busyRow - 1
 		}
 	case KeyArrowRight:
-		if busyCol+1 <= MaxCol {
+		if busyCol+1 <= sc.maxCol {
 			newBusyCol = busyCol + 1
 		}
 	case KeyArrowLeft:
@@ -100,10 +111,13 @@ func (sc *Screen) Move() {
 		}
 	}
 
-	sc.cells[busyRow][busyCol].Busy = false
-	sc.cells[newBusyRow][newBusyCol].Busy = true
+	if sc.cells[busyRow][busyCol].Success || (!sc.cells[busyRow][busyCol].Success && sc.cells[newBusyRow][newBusyCol].Success) {
+		sc.cells[busyRow][busyCol].Busy = false
+		sc.cells[newBusyRow][newBusyCol].Busy = true
+		return
+	}
+	fmt.Printf("invalid movement")
 
-	fmt.Printf("old busy = (%d,%d) %t, move to (%d,%d) %t \n", busyRow, busyCol, sc.cells[busyRow][busyCol].Busy, newBusyRow, newBusyCol, sc.cells[newBusyRow][newBusyCol].Busy)
 }
 func (sc *Screen) findBusy() (int, int) {
 	for rowIdx, row := range sc.cells {
@@ -114,4 +128,15 @@ func (sc *Screen) findBusy() (int, int) {
 		}
 	}
 	panic("invalid busy state")
+}
+
+func (sc *Screen) EvaluateAction() {
+	busyRow, busyCol := sc.findBusy()
+	if sc.cells[busyRow][busyCol].Success {
+		return
+	}
+	success := sc.challenger.Challenge()
+	if success {
+		sc.cells[busyRow][busyCol].Success = true
+	}
 }

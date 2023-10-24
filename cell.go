@@ -28,14 +28,14 @@ func NewCell() Cell {
 	}
 	return Cell{
 		Type:    callType,
-		Success: true,
+		Success: false,
 		Busy:    false,
 	}
 }
 
-func (c Cell) Print() {
+func (c Cell) Print(printBusy bool) {
 	/*🚪⬜️👻🍭🎃*/
-	if c.Busy {
+	if printBusy && c.Busy {
 		print("🎃")
 		return
 	}

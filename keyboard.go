@@ -10,6 +10,8 @@ const (
 	KeyArrowDown    Key = 1
 	KeyArrowLeft    Key = 2
 	KeyArrowRight   Key = 3
+	KeyY            Key = 4
+	KeyN            Key = 5
 )
 
 type Key int
@@ -18,7 +20,7 @@ func init() {
 	keyboard.Open()
 }
 func readKeyboard() Key {
-	_, key, err := keyboard.GetKey()
+	r, key, err := keyboard.GetKey()
 	if err != nil {
 		panic(err)
 	}
@@ -32,5 +34,12 @@ func readKeyboard() Key {
 	case keyboard.KeyArrowLeft:
 		return KeyArrowLeft
 	}
+	if r == 121 {
+		return KeyY
+	}
+	if r == 110 {
+		return KeyN
+	}
+
 	return KeyArrowUnknown
 }
