@@ -6,14 +6,10 @@ func main() {
 
 	sc := NewScreen()
 	sc.Print()
-	for {
-		key := readKeyboard()
-		sc.Move(key)
+	for !sc.Game() {
+		sc.Move()
 		sc.Print()
-		if sc.Game() {
-			fmt.Println("Congratulaciones")
-			return
-		}
 	}
+	fmt.Println("Congratulaciones")
 
 }

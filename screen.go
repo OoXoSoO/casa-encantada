@@ -70,8 +70,9 @@ func runCmd(name string, arg ...string) {
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 }
-func (sc *Screen) Move(key Key) {
+func (sc *Screen) Move() {
 
+	key := readKeyboard()
 	if key == KeyArrowUnknown {
 		return
 	}
