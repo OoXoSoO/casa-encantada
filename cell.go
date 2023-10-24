@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"time"
 )
 
 const (
@@ -15,27 +16,33 @@ type CellType int
 
 type Cell struct {
 	Type    CellType
-	Visible bool
+	Success bool
+	Busy    bool
 }
 
 func NewCell() Cell {
-	t := rand.Intn(99)
+	ra := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(99)
 	callType := CellTypeBlank
-	if t <= 0 {
+	if ra <= 9 {
 		callType = CellTypeGhost
 	}
 	return Cell{
 		Type:    callType,
-		Visible: false,
+		Success: true,
+		Busy:    false,
 	}
 }
 
 func (c Cell) Print() {
-	if !c.Visible {
+	/*🚪⬜️👻🍭🎃*/
+	if c.Busy {
+		print("🎃")
+		return
+	}
+	if !c.Success {
 		print("❓")
 		return
 	}
-	/*🚪⬜️👻🍭*/
 	switch c.Type {
 	case CellTypeBlank:
 		print("⬜️")
