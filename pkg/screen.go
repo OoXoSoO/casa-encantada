@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"fmt"
@@ -14,9 +14,10 @@ type Screen struct {
 	challenger Challenger
 	maxRows    int
 	maxCol     int
+	kbReader   KeyBoarReader
 }
 
-func NewScreen(maxRows int, maxCol int) *Screen {
+func NewScreen(maxRows int, maxCol int, challenger Challenger, kbReader KeyBoarReader) *Screen {
 
 	ra := rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -24,7 +25,8 @@ func NewScreen(maxRows int, maxCol int) *Screen {
 		cells:      make([][]Cell, maxRows+1),
 		maxRows:    maxRows,
 		maxCol:     maxCol,
-		challenger: NewChallenger(),
+		challenger: challenger,
+		kbReader:   kbReader,
 	}
 	for rowIdx := range ret.cells {
 		row := make([]Cell, ret.maxCol+1)
@@ -83,7 +85,7 @@ func runCmd(name string, arg ...string) {
 }
 func (sc *Screen) Move() {
 
-	key := readKeyboard()
+	key := sc.kbReader.ReadKeyboard()
 	if key == KeyArrowUnknown {
 		return
 	}

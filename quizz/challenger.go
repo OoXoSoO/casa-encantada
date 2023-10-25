@@ -1,14 +1,19 @@
-package main
+package quizz
 
-import "fmt"
+import (
+	"casa/pkg"
+	"fmt"
+)
 
 type Challenger struct {
-	quizzer Quizzer
+	quizzer  Quizzer
+	kbReader pkg.KeyBoarReader
 }
 
-func NewChallenger() Challenger {
+func NewChallenger(kbReader pkg.KeyBoarReader) Challenger {
 	return Challenger{
-		quizzer: NewQuizzer(),
+		quizzer:  NewQuizzer(),
+		kbReader: kbReader,
 	}
 }
 func (c Challenger) Challenge() bool {
@@ -21,21 +26,21 @@ func (c Challenger) Challenge() bool {
 
 func (c Challenger) triggerChallenge() bool {
 	q := c.quizzer.NewQuizz()
-	r := getResponse(q)
+	r := c.getResponse(q)
 	return r == q.Response
 }
 
-func getResponse(q Quizz) bool {
+func (c Challenger) getResponse(q Quizz) bool {
 	// y = true
 	// n = false
 	// any other value, relauch the request
 	for {
 		fmt.Println(q.Text)
-		key := readKeyboard()
+		key := c.kbReader.ReadKeyboard()
 		switch key {
-		case KeyY:
+		case pkg.KeyY:
 			return true
-		case KeyN:
+		case pkg.KeyN:
 			return false
 		}
 		fmt.Println("Invalid response, please try again")

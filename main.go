@@ -1,9 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"casa/keyboard"
+	"casa/pkg"
+	"casa/quizz"
+	"fmt"
+)
 
 func main() {
-	sc := NewScreen(4, 4)
+	kbreader := keyboard.NewKeyBoardReader()
+	challenger := quizz.NewChallenger(kbreader)
+	sc := pkg.NewScreen(4, 4, challenger, kbreader)
+
 	sc.Print()
 	for !sc.Game() {
 		sc.Move()

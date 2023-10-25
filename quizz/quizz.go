@@ -1,4 +1,4 @@
-package main
+package quizz
 
 import (
 	"math/rand"
