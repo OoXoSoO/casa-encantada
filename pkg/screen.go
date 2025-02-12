@@ -76,6 +76,8 @@ func (sc *Screen) print(printBusy bool) {
 		}
 		println("")
 	}
+	println("Move the pumpkin with the arrow keys to find the candy")
+
 }
 
 func runCmd(name string, arg ...string) {

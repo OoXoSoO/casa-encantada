@@ -18,8 +18,14 @@ func NewChallenger(kbReader pkg.KeyBoarReader) Challenger {
 }
 func (c Challenger) Challenge() bool {
 	success := false
+	tries := 0
+	fmt.Println("Please answer with y (yes) or n (no).")
 	for !success {
+		if tries > 0 {
+			fmt.Println("Try again with a new challenge.")
+		}
 		success = c.triggerChallenge()
+		tries++
 	}
 	return success
 }
@@ -43,7 +49,7 @@ func (c Challenger) getResponse(q Quizz) bool {
 		case pkg.KeyN:
 			return false
 		}
-		fmt.Println("Invalid response, please try again")
+		fmt.Println("Invalid response (y/n), please try again.")
 	}
 
 }
